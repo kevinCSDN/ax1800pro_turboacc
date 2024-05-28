@@ -62,30 +62,9 @@ jobs:
       working-directory: /workdir
       run: |
         git clone ${{ env.REPO_URL }} -b ${{ env.REPO_BRANCH }} openwrt
-        # Ensure the openwrt directory is present and contains the expected scripts
-        if [ ! -d "openwrt/scripts" ]; then
-          echo "The cloned repository does not contain the expected 'scripts' directory."
-          exit 1
-        fi
         ln -s /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-    - name: 更新源和安装依赖
-      working-directory: /workdir/openwrt
-      run: |
-        # Moves to the working directory
-        cd /workdir/openwrt
-        # Now runs the scripts
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
-        
-    - name: 导入配置文件
-      working-directory: /workdir/openwrt
-      run: |
-        if [ -f ".config" ]; then
-          make oldconfig
-        else
-          cp defconfig .config
-        fi
+
 
     - name: 编译OpenWrt固件
       working-directory: /workdir/openwrt
