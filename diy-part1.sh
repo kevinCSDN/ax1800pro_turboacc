@@ -29,7 +29,8 @@ cp -r openwrt-packages/{luci-app-netdata,firewall4,luci-app-fullconenat} package
 rm -rf openwrt-packages
 
 rm -rf package/network/config/firewall
-git clone https://github.com/fullcone-nat-nftables/openwrt-firewall4-with-fullcone.git package/network/config/firewall
+git clone https://github.com/immortalwrt/immortalwrt.git
+cp -r immortalwrt/package/network/config/firewall package/network/config/
 #git clone https://github.com/fullcone-nat-nftables/openwrt-firewall4-with-fullcone.git package/fullcone-nat-nftables
 git clone https://github.com/f8q8/luci-app-autoreboot package/luci-app-autoreboot
 ./scripts/feeds install -a 
