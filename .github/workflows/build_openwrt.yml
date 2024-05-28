@@ -1,48 +1,52 @@
 name: Compile NSS Packages
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 env:
-  REPO_URL: https://github.com/qosmio/nss-packages
-  REPO_BRANCH: main
+  REPO_URL: https://github.com/qosmio/nss-packages.git
+  REPO_BRANCH: NSS-12.4-K6.x
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
 jobs:
-  compile-nss-packages:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Set up working environment
+    - name: Setting up build environment
       run: |
         mkdir -p $GITHUB_WORKSPACE/build
-        sudo chown $USER:$GROUPS $GITHUB_WORKSPACE/build
-        
-    - name: Checkout NSS packages code
-      uses: actions/checkout@v3
-      with:
-        repository: qosmio/nss-packages
-        path: 'nss-packages'
-        ref: ${{ env.REPO_BRANCH }}
-      
+        sudo chown -R $USER:$GROUPS $GITHUB_WORKSPACE/build
+
+    - name: Clone source code
+      run: |
+        git clone ${{ env.REPO_URL }} $GITHUB_WORKSPACE/nss-packages --branch ${{ env.REPO_BRANCH }} --single-branch
+
     - name: Prepare build environment for OpenWrt packages
       run: |
         sudo apt update && sudo apt install -y build-essential libncurses5-dev libncursesw5-dev \
         zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python
-      
+
+    - name: Sync the source code (if necessary)
+      run: |
+        cd $GITHUB_WORKSPACE/nss-packages
+        git pull
+
     - name: Compile .ipk package
       run: |
-        cd nss-packages
-        # Assuming the Makefile is located in the root of `nss-packages` repository
-        # If the Makefile is elsewhere within the repository, change the working directory accordingly
+        cd $GITHUB_WORKSPACE/nss-packages
+        # Make sure the following compile command is compatible with your Makefile or build script
         make package/compile V=s
-      
-    - name: Find the .ipk files
+
+    - name: Find .ipk files
       run: |
-        # This finds any .ipk files that were created during the build and moves them to the upload directory
-        ipk_files=$(find $GITHUB_WORKSPACE -name '*.ipk' -type f)
-        echo "Found .ipk files: $ipk_files"
-        mkdir -p $GITHUB_WORKSPACE/build
-        mv $ipk_files $GITHUB_WORKSPACE/build
+        ipk_files=$(find $GITHUB_WORKSPACE/nss-packages/bin/packages -type f -name "*.ipk")
+        if [ -z "$ipk_files" ]; then
+          echo "No .ipk files found."
+          exit 1
+        fi
+        mv $ipk_files $GITHUB_WORKSPACE/build/
 
     - name: Upload compiled .ipk packages
       uses: actions/upload-artifact@v2
