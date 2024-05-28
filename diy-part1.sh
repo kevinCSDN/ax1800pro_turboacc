@@ -30,6 +30,6 @@ rm -rf openwrt-packages
 
 
 
-
+git clone https://github.com/fullcone-nat-nftables/openwrt-firewall4-with-fullcone.git package/fullcone-nat-nftables
 git clone https://github.com/f8q8/luci-app-autoreboot package/luci-app-autoreboot
 ./scripts/feeds install -a 
