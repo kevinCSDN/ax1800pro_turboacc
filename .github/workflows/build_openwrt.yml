@@ -66,10 +66,10 @@ jobs:
 
 
 
-    - name: 编译OpenWrt固件
-      working-directory: /workdir/openwrt
+    - name: 编译包
       run: |
-        make -j$(nproc) V=s
+        cd openwrt-package
+        make package/${{ env.PACKAGE_NAME }}/compile V=s
 
     - name: 查找编译好的ipk包
       run: |
