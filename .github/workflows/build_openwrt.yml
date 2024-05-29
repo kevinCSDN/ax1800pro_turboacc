@@ -68,7 +68,7 @@ jobs:
 
     - name: 编译包
       run: |
-        cd openwrt-package
+        cd openwrt
         make package/${{ env.PACKAGE_NAME }}/compile V=s
 
     - name: 查找编译好的ipk包
